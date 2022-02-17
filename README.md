@@ -31,7 +31,12 @@ Run command to init database:
 
     DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py init
 
+Download data from http://download.companieshouse.gov.uk/en_pscdata.html
 
+For each  file you get, run the load command:
+
+
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py loadpscfile psc-snapshot-2022-02-17_1of20.txt
 
 
 

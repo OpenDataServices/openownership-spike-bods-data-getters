@@ -19,6 +19,11 @@ def init_command():
 @click.argument("filename")
 def loadpscfile_command(filename: str):
     click.echo("Loading file")
+    run = UKPSCRun(os.getenv("DATABASE"))
+    with open(filename) as fp:
+        for index, line in enumerate(fp):
+            run.add_data_line(line.strip())
+
 
 @click.command("addopencorporates")
 def addopencorporates_command():
