@@ -1,5 +1,7 @@
 import psycopg2
+import psycopg2.extras
 import json
+import requests
 
 
 class UKPSCRun:
@@ -13,7 +15,8 @@ class UKPSCRun:
         cur = self._conn.cursor()
         cur.execute(
             "CREATE TABLE entity ("+
-            "company_number VARCHAR(200)  PRIMARY KEY"+
+            "company_number VARCHAR(200)  PRIMARY KEY,"+
+            "open_corporates_data JSONB NULL "
             ");"
         )
         cur.execute(
@@ -40,3 +43,26 @@ class UKPSCRun:
         )
         self._conn.commit()
         cur.close()
+
+    def add_open_corporates(self):
+        cur = self._conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT company_number FROM entity WHERE open_corporates_data IS NULL "
+        )
+        for record in cur:
+            self.add_open_corporates_to_entity(record['company_number'])
+        cur.close()
+
+    def add_open_corporates_to_entity(self, company_number: str):
+        print(company_number)
+        r = requests.get( 'https://api.opencorporates.com/companies/gb/' + company_number)
+        if r.status_code != 200:
+            raise Exception("NON 200 ERROR!")
+        cur = self._conn.cursor()
+        cur.execute(
+            "UPDATE  entity SET open_corporates_data=%s WHERE company_number=%s ",
+            (r.text, company_number)
+        )
+        self._conn.commit()
+        cur.close()
+        #raise Exception("JUST ONE")

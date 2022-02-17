@@ -38,7 +38,9 @@ For each  file you get, run the load command:
 
     DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py loadpscfile psc-snapshot-2022-02-17_1of20.txt
 
+Then add Open Corporates Info:
 
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py addopencorporates
 
 
 

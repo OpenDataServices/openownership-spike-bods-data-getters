@@ -28,6 +28,8 @@ def loadpscfile_command(filename: str):
 @click.command("addopencorporates")
 def addopencorporates_command():
     click.echo("Adding Open Corporates")
+    run = UKPSCRun(os.getenv("DATABASE"))
+    run.add_open_corporates()
 
 
 
