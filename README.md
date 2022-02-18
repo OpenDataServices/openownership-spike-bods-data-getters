@@ -42,7 +42,9 @@ Then add Open Corporates Info:
 
     DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py addopencorporates
 
+Finally dump your new BODS data to a file:
 
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py dumpbods bodsoutput.json
 
 ## Cleaning up
 

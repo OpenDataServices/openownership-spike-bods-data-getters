@@ -39,6 +39,11 @@ def dumpbods_command(
      filename: str
 ):
     click.echo("Dump BODS")
+    run = UKPSCRun(os.getenv("DATABASE"))
+    with open(filename, "w") as fp:
+        run.dump_bods(fp)
+
+
 cli.add_command(init_command)
 cli.add_command(loadpscfile_command)
 cli.add_command(addopencorporates_command)
