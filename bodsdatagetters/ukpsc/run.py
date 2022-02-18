@@ -99,6 +99,10 @@ class UKPSCRun:
                 {
                     "scheme": "GB-COH",
                     "id": record['company_number'],
+                },
+                {
+                    "scheme": "OPENCORPORATESURL", # TODO not a valid scheme
+                    "id": record['open_corporates_data']['results']['company']['opencorporates_url']
                 }
             ],
             "publicationDetails": {
