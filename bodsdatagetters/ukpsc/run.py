@@ -125,7 +125,7 @@ class UKPSCRun:
         person_statement = {
             "statementID": "person" + str(record['id']),  # TODO this is a shitty id to use as it will change every time
             "statementType": "personStatement",
-            "personType": " knownPerson",
+            "personType": "knownPerson",
             "isComponent": False,  # TODO ???????????????????????????????????
             "names": [
                 {
