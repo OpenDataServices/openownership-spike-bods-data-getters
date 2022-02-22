@@ -45,7 +45,7 @@ class UKPSCRun:
             (json_data['company_number'],)
         )
         cur.execute(
-            "INSERT INTO  psc_data (company_number, psc_data) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+            "INSERT INTO  psc_data (company_number, psc_data) VALUES (%s, %s)",
             (json_data['company_number'], json.dumps(json_data['data']))
         )
         self._conn.commit()
