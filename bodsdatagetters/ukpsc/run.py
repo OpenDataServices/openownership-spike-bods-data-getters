@@ -112,7 +112,7 @@ class UKPSCRun:
             "statementType": "entityStatement",
             "entityType": "registeredEntity",
             "isComponent": False,  # TODO ???????????????????????????????????
-            "name": record['open_corporates_data']['results']['company']['name'],
+            "name": record['open_corporates_data']['name'],
             "incorporatedInJurisdiction": {
                 "name": "GB-Name",
                 "code": "GB"
@@ -124,7 +124,7 @@ class UKPSCRun:
                 },
                 {
                     "scheme": "OPENCORPORATESURL", # TODO not a valid scheme
-                    "id": record['open_corporates_data']['results']['company']['opencorporates_url']
+                    "id": "https://opencorporates.com/companies/gb/" + record['company_number']
                 }
             ],
             "publicationDetails": {
@@ -139,11 +139,14 @@ class UKPSCRun:
 
     def _get_person_statement_for_psc_data_row(self, record):
         # TODO is there a form of PSC where another company has control? )
-        address_string = ",".join([i for i in [record['psc_data']['address']['premises'],
-                                               record['psc_data']['address']['address_line_1'],
-                                               record['psc_data']['address']['locality'],
-                                               record['psc_data']['address']['postal_code'],
-                                               record['psc_data']['address']['country'], ] if i])
+        address_bits = [
+            record['psc_data']['address'].get('premises'),
+            record['psc_data']['address'].get('address_line_1'),
+            record['psc_data']['address'].get('locality'),
+            record['psc_data']['address'].get('postal_code'),
+            record['psc_data']['address'].get('country'),
+        ]
+        address_string = ",".join([i for i in address_bits if i])
         person_statement = {
             "statementID": "person" + str(record['id']),  # TODO this is a shitty id to use as it will change every time
             "statementType": "personStatement",
