@@ -17,11 +17,14 @@ def init_command():
 
 @click.command("loadpscfile")
 @click.argument("filename")
-def loadpscfile_command(filename: str):
+@click.option('-c', '--count', default=-1)
+def loadpscfile_command(filename: str, count: int = -1):
     click.echo("Loading file")
     run = UKPSCRun(os.getenv("DATABASE"))
     with open(filename) as fp:
         for index, line in enumerate(fp):
+            if count > 0 and index > count:
+                return
             run.add_data_line(line.strip())
 
 
