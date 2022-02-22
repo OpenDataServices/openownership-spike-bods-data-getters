@@ -18,12 +18,21 @@ class UKPSCRun:
             ");"
         )
         cur.execute(
+            "CREATE TABLE open_corporates_officer ("+
+            "id BIGSERIAL PRIMARY KEY, "+
+            "company_number VARCHAR(200),"+
+            "open_corporates_data JSONB NULL "
+            ");"
+        )
+        cur.execute("CREATE INDEX open_corporates_officer_company_number ON open_corporates_officer (company_number);")
+        cur.execute(
             "CREATE TABLE psc_data ("+
             "id BIGSERIAL PRIMARY KEY, "+
             "company_number VARCHAR(200), "+
             "psc_data JSONB "+
             ");"
         )
+        cur.execute("CREATE INDEX psc_data_company_number ON psc_data (company_number);")
         self._conn.commit()
         cur.close()
 
@@ -44,10 +53,40 @@ class UKPSCRun:
         #raise Exception("JUST ONE")
 
     def process_open_corporates_companies(self, data):
-        pass
+        # GB companies only
+        if data['jurisdiction_code'] != 'gb':
+            return
+
+        # Update
+        # This also means we are checking the data exists in PSC data.
+        cur = self._conn.cursor()
+        cur.execute(
+            "UPDATE entity SET open_corporates_data=%s WHERE company_number=%s",
+            (json.dumps(data), data['company_number'])
+        )
+        self._conn.commit()
+        cur.close()
 
     def process_open_corporates_officers(self, data):
-        pass
+        # GB companies only
+        if data['jurisdiction_code'] != 'gb':
+            return
+
+        # Work
+        cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT COUNT(*) AS c FROM entity WHERE company_number=%s",
+            (data['company_number'],)
+        )
+        count_data = cur.fetchone()
+        if count_data['c'] > 0:
+            cur.execute(
+                "INSERT INTO  open_corporates_officer (company_number, open_corporates_data) VALUES (%s, %s)",
+                (data['company_number'], json.dumps(data))
+            )
+            self._conn.commit()
+        cur.close()
+
 
     def dump_bods(self, output_steam):
         cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
