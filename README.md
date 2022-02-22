@@ -38,9 +38,10 @@ For each  file you get, run the load command:
 
     DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py loadpscfile psc-snapshot-2022-02-17_1of20.txt
 
-Then add Open Corporates Info:
+Then add Open Corporates Info - get bulk data as CSV files:
 
-    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py addopencorporates
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py addopencorporatescompanies companies.csv
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py addopencorporatesofficers officers.csv
 
 Finally dump your new BODS data to a file:
 

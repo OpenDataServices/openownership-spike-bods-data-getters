@@ -1,7 +1,7 @@
 from bodsdatagetters.ukpsc.run import UKPSCRun
 import click
 import os
-
+import csv
 
 @click.group()
 def cli():
@@ -28,11 +28,31 @@ def loadpscfile_command(filename: str, count: int = -1):
             run.add_data_line(line.strip())
 
 
-@click.command("addopencorporates")
-def addopencorporates_command():
-    click.echo("Adding Open Corporates")
+@click.command("addopencorporatescompanies")
+@click.argument("filename")
+def addopencorporates_companies_command(filename: str):
+    click.echo("Adding Open Corporates Companies")
     run = UKPSCRun(os.getenv("DATABASE"))
-    run.add_open_corporates()
+    with open(filename) as csvfile:
+        csvreader = csv.reader(csvfile)
+        headers = next(csvreader)
+        for row in csvreader:
+            data = {headers[i]: row[i] for i in range(min(len(headers),len(row)))}
+            run.process_open_corporates_companies(data)
+
+
+
+@click.command("addopencorporatesofficers")
+@click.argument("filename")
+def addopencorporates_companies_officers(filename: str):
+    click.echo("Adding Open Corporates Officers")
+    run = UKPSCRun(os.getenv("DATABASE"))
+    with open(filename) as csvfile:
+        csvreader = csv.reader(csvfile)
+        headers = next(csvreader)
+        for row in csvreader:
+            data = {headers[i]: row[i] for i in range(min(len(headers),len(row)))}
+            run.process_open_corporates_officers(data)
 
 
 
@@ -49,7 +69,8 @@ def dumpbods_command(
 
 cli.add_command(init_command)
 cli.add_command(loadpscfile_command)
-cli.add_command(addopencorporates_command)
+cli.add_command(addopencorporates_companies_command)
+cli.add_command(addopencorporates_companies_officers)
 cli.add_command(dumpbods_command)
 
 if __name__ == "__main__":

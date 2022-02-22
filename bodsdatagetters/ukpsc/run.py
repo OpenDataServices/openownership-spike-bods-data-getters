@@ -43,28 +43,11 @@ class UKPSCRun:
         cur.close()
         #raise Exception("JUST ONE")
 
-    def add_open_corporates(self):
-        cur = self._conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
-        cur.execute(
-            "SELECT company_number FROM entity WHERE open_corporates_data IS NULL "
-        )
-        for record in cur:
-            self.add_open_corporates_to_entity(record['company_number'])
-        cur.close()
+    def process_open_corporates_companies(self, data):
+        pass
 
-    def add_open_corporates_to_entity(self, company_number: str):
-        print(company_number)
-        r = requests.get( 'https://api.opencorporates.com/companies/gb/' + company_number)
-        if r.status_code != 200:
-            raise Exception("NON 200 ERROR!")
-        cur = self._conn.cursor()
-        cur.execute(
-            "UPDATE  entity SET open_corporates_data=%s WHERE company_number=%s ",
-            (r.text, company_number)
-        )
-        self._conn.commit()
-        cur.close()
-        #raise Exception("JUST ONE")
+    def process_open_corporates_officers(self, data):
+        pass
 
     def dump_bods(self, output_steam):
         cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
