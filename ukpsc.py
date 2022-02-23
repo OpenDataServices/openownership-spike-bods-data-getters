@@ -15,17 +15,12 @@ def init_command():
     run.init()
 
 
-@click.command("loadpscfile")
-@click.argument("filename")
-@click.option('-c', '--count', default=-1)
-def loadpscfile_command(filename: str, count: int = -1):
-    click.echo("Loading file")
+@click.command("loadpscdata")
+@click.argument("apikey")
+def loadpscdata_command(apikey: str, count: int = -1):
+    click.echo("Loading data")
     run = UKPSCRun(os.getenv("DATABASE"))
-    with open(filename) as fp:
-        for index, line in enumerate(fp):
-            if count > 0 and index > count:
-                return
-            run.add_data_line(line.strip())
+    run.load_psc_data(apikey)
 
 
 @click.command("addopencorporatescompanies")
@@ -68,7 +63,7 @@ def dumpbods_command(
 
 
 cli.add_command(init_command)
-cli.add_command(loadpscfile_command)
+cli.add_command(loadpscdata_command)
 cli.add_command(addopencorporates_companies_command)
 cli.add_command(addopencorporates_companies_officers)
 cli.add_command(dumpbods_command)

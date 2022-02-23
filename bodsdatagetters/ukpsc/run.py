@@ -2,7 +2,7 @@ import psycopg2
 import psycopg2.extras
 import json
 import requests
-
+import base64
 
 class UKPSCRun:
 
@@ -36,21 +36,45 @@ class UKPSCRun:
         self._conn.commit()
         cur.close()
 
-    def add_data_line(self, line):
-        json_data = json.loads(line)
-        print(json.dumps(json_data, indent=2))
+    def load_psc_data(self, apikey: str):
+        headers = {'Authorization': 'Basic ' + base64.b64encode(apikey.encode('ascii')).decode("ascii") }
+        # TODO What value should timepoint be to start at the start of the data stream?
+        # Passing no timepoint gets you events published now.
+        # But passing timepoint=1 gets you a 416 header response.
+        # Presumably there is a magic number that you need to pass that gets you from the start of the data, but doesn't 416.
+        # Docs say to pass an integer but not what scheme is.
+        # Real data has "2022-02-23T11:41:28" == 2749113 and that is no integer time encoding scheme I know off, so I can't guess.
+        timepoint = 2749100
+        r = requests.get(
+            'https://stream.companieshouse.gov.uk/persons-with-significant-control?timepoint='+str(timepoint),
+            headers=headers,
+            stream=True
+        )
+        if r.status_code != 200:
+            print(r.text)
+            raise Exception("NON 200 ERROR! " + str(r.status_code))
+        for line in r.iter_lines():
+            data = json.loads(line.decode("utf-8"))
+            print(data)
+            self.add_line_from_streaming_psc_data(data)
+
+    def add_line_from_streaming_psc_data(self, data: dict):
+
+        resource_uri_bits = data.get('resource_uri').split('/')
+        company_number = resource_uri_bits[2]
+
+        # TODO One transaction per line is going to be slow, be much faster if we could batch in groups
         cur = self._conn.cursor()
         cur.execute(
             "INSERT INTO  entity (company_number) VALUES (%s) ON CONFLICT DO NOTHING",
-            (json_data['company_number'],)
+            (company_number,)
         )
         cur.execute(
-            "INSERT INTO  psc_data (company_number, psc_data) VALUES (%s, %s)",
-            (json_data['company_number'], json.dumps(json_data['data']))
+            "INSERT INTO psc_data (company_number, psc_data) VALUES (%s, %s)",
+            (company_number, json.dumps(data))
         )
         self._conn.commit()
         cur.close()
-        #raise Exception("JUST ONE")
 
     def process_open_corporates_companies(self, data):
         # GB companies only
@@ -112,7 +136,6 @@ class UKPSCRun:
             "statementType": "entityStatement",
             "entityType": "registeredEntity",
             "isComponent": False,  # TODO ???????????????????????????????????
-            "name": record['open_corporates_data']['name'],
             "incorporatedInJurisdiction": {
                 "name": "GB-Name",
                 "code": "GB"
@@ -135,16 +158,19 @@ class UKPSCRun:
                 }
             }
         }
+        if record['open_corporates_data']:
+            entity_statement['name'] = record['open_corporates_data']['name']
+
         return entity_statement
 
     def _get_person_statement_for_psc_data_row(self, record):
         # TODO is there a form of PSC where another company has control? )
         address_bits = [
-            record['psc_data']['address'].get('premises'),
-            record['psc_data']['address'].get('address_line_1'),
-            record['psc_data']['address'].get('locality'),
-            record['psc_data']['address'].get('postal_code'),
-            record['psc_data']['address'].get('country'),
+            record['psc_data']['data']['address'].get('premises'),
+            record['psc_data']['data']['address'].get('address_line_1'),
+            record['psc_data']['data']['address'].get('locality'),
+            record['psc_data']['data']['address'].get('postal_code'),
+            record['psc_data']['data']['address'].get('country'),
         ]
         address_string = ",".join([i for i in address_bits if i])
         person_statement = {
@@ -155,14 +181,14 @@ class UKPSCRun:
             "names": [
                 {
                     "type": "individual",
-                    "fullName": record['psc_data']['name']
+                    "fullName": record['psc_data']['data']['name']
                 }
             ],
             "addresses": [
                 {
                     "type": "registered",
                     "address": address_string,
-                    "postCode": record['psc_data']['address']['postal_code'],
+                    "postCode": record['psc_data']['data']['address'].get('postal_code'),
                     "country": ""  # TODO Can't assume GB, need to look at country ???????????????????????????????????
                 }
             ],

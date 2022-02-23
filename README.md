@@ -21,6 +21,19 @@ Run a postgres server via Docker (or elsewhere):
     -p 54321:5432 \
     postgres:14
 
+
+## Getting UK PSC Streaming API Key
+
+https://developer-specs.company-information.service.gov.uk/streaming-api/guides/authentication has links to:
+
+* register for an account
+* Go to https://developer.company-information.service.gov.uk/manage-applications and make an app
+* Create a Streaming API key for your app (this step is different from making an app - the docs above are slightly out of date)
+
+## Getting Open Corporates Bulk Data Files
+
+Ask our OO contacts
+
 ### For each run:
 
 You need a new database - create one:
@@ -31,12 +44,12 @@ Run command to init database:
 
     DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py init
 
-Download data from http://download.companieshouse.gov.uk/en_pscdata.html
+Get PSC Data:
 
-For each  file you get, run the load command:
+    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py loadpscdata APIKEY
 
 
-    DATABASE=postgres://postgres:1234@localhost:54321/run1 python ukpsc.py loadpscfile psc-snapshot-2022-02-17_1of20.txt
+This will keep running, you'll need to Ctrl-C manually
 
 Then add Open Corporates Info - get bulk data as CSV files:
 
