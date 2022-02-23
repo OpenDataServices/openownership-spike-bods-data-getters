@@ -129,3 +129,16 @@ It would be ideal to have stable ID's so that a bulk processing done one month t
 
 The PSC data has some fields (`resource_id` & `resource_uri`) that may be useful here, but we need to check if these are stable. 
 
+### When entities declare an interest in another entity
+
+This is marked by `"kind": "corporate-entity-person-with-significant-control"` in the PSC data.
+
+In this case, the `identification` block is meant to be populated with information. Ideally we could mark this as another company we care about by storing that in the entities table. This would mean it is enriched with Open Corporates data and an entity statement is output for it.
+
+However, it is clear there is no data validation on  the `identification` block. In our very limited sample of real data, we saw still values of:
+
+* `"legal_form": "Private Company Limited By Shares", "legal_authority": "Companies Act 2006", "place_registered": "Uk Register Of Companies", "country_registered": "United Kingdom"`
+* `"legal_form": "Limited By Shares- Corporate", "legal_authority": "Uk", "place_registered": "England", "country_registered": "England"`
+* `"legal_form": "Limited Company", "legal_authority": "Companies Act", "place_registered": "England & Wales", "country_registered": "England And Wales"`
+
+We need to load lots of data and do a data cleaning exercise before continuing with this.
