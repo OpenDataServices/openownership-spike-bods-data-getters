@@ -220,6 +220,62 @@ class UKPSCRun:
                 "publisher": {
                     "name": "SPIKE CONVERSION TOOL of UK PSR with additional Open Corporates Info"
                 }
-            }
+            },
+            "interests":[]
         }
+        for nature_of_control in record['psc_data']['data']['natures_of_control']:
+            # See https://github.com/companieshouse/api-enumerations/blob/master/psc_descriptions.yml for complete list
+            # TODO add rest from above list
+            if nature_of_control == 'ownership-of-shares-25-to-50-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'shareholding',
+                    'share': {
+                        'minimum': 25,
+                        'maximum': 50
+                    }
+                })
+            elif nature_of_control == 'ownership-of-shares-50-to-75-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'shareholding',
+                    'share': {
+                        'minimum': 50,
+                        'maximum': 74
+                    }
+                })
+            elif nature_of_control == 'ownership-of-shares-75-to-100-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'shareholding',
+                    'share': {
+                        'minimum': 75,
+                        'maximum': 100
+                    }
+                })
+            elif nature_of_control == 'voting-rights-25-to-50-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'voting-rights',
+                    'share': {
+                        'minimum': 25,
+                        'maximum': 50
+                    }
+                })
+            elif nature_of_control == 'voting-rights-50-to-75-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'voting-rights',
+                    'share': {
+                        'minimum': 50,
+                        'maximum': 74
+                    }
+                })
+            elif nature_of_control == 'voting-rights-75-to-100-percent':
+                ownership_or_control_statement['interests'].append({
+                    'type':'voting-rights',
+                    'share': {
+                        'minimum': 75,
+                        'maximum': 100
+                    }
+                })
+            elif nature_of_control == 'significant-influence-or-control':
+                ownership_or_control_statement['interests'].append({
+                    'type':'other-influence-or-control'
+                })
         return ownership_or_control_statement
