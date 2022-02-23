@@ -54,6 +54,7 @@ class UKPSCRun:
             print(r.text)
             raise Exception("NON 200 ERROR! " + str(r.status_code))
         for line in r.iter_lines():
+            # TODO Encoding errors have been seen when loading data - this needs to be looked into
             data = json.loads(line.decode("utf-8"))
             print(data)
             self.add_line_from_streaming_psc_data(data)
