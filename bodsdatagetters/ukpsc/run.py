@@ -165,10 +165,15 @@ class UKPSCRun:
 
     def _get_person_statement_for_psc_data_row(self, record):
         # TODO is there a form of PSC where another company has control? )
+        # TODO From the data model spec, it's not clear what order these address fields should be in to make a sensible address
         address_bits = [
+            record['psc_data']['data']['address'].get('po_box'),
+            record['psc_data']['data']['address'].get('care_of'),
             record['psc_data']['data']['address'].get('premises'),
             record['psc_data']['data']['address'].get('address_line_1'),
+            record['psc_data']['data']['address'].get('address_line_2'),
             record['psc_data']['data']['address'].get('locality'),
+            record['psc_data']['data']['address'].get('region'),
             record['psc_data']['data']['address'].get('postal_code'),
             record['psc_data']['data']['address'].get('country'),
         ]
