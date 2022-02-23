@@ -120,8 +120,9 @@ class UKPSCRun:
         for record in cur:
             json.dump(self._get_entity_statement_for_entity_record(record), output_steam)
             output_steam.write("\n")
+        # TODO later there may be a better field than id to sort by, like a date field
         cur.execute(
-            "SELECT * FROM psc_data"
+            "SELECT * FROM psc_data ORDER BY id ASC"
         )
         for record in cur:
             json.dump(self._get_person_statement_for_psc_data_row(record), output_steam)
